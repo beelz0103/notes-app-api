@@ -60,3 +60,31 @@ exports.notes_create = [
     res.json(`Note uploaded successfully: ${newNote}`);
   },
 ];
+
+//add code for error handling later
+exports.note_update = [
+  upload.array("file"),
+  async (req, res) => {
+    const id = req.params.id;
+    // const images = [];
+    const { title, content, images } = req.body;
+    const upateQuery = Note.findByIdAndUpdate(id, { title, content, images });
+    console.log(upateQuery);
+    await upateQuery;
+
+    // await Promise.all(
+    //   req.files.map(async (file) => {
+    //     const image = new Image({ url: file.path.slice(7) });
+    //     images.push(image);
+    //     return image.save();
+    //   })
+    // );
+
+    // const newNote = new Note({ title, content, images });
+    // await newNote.save();
+
+    res.json(
+      `Note uploaded successfully: ${{ title, content, images, _id: id }}`
+    );
+  },
+];

@@ -7,8 +7,8 @@ router.get("/", index_controller.index);
 
 router.get("/notes", index_controller.notes_get);
 
-router.post("/note/create");
-
 router.post("/note/create", index_controller.notes_create);
+
+router.post("/note/:id/update", index_controller.note_update);
 
 module.exports = router;
