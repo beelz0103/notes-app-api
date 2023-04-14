@@ -66,22 +66,25 @@ exports.note_update = [
   upload.array("file"),
   async (req, res) => {
     const id = req.params.id;
-    // const images = [];
-    const { title, content, images } = req.body;
+    const images = [];
+    const { title, content } = req.body;
+
+    const note = await Note.findById(id);
+    const noteImages = note.images;
+    const removeDuplicateImagesQuery = noteImages.map(async (image) => {
+      return Image.findByIdAndRemove(image._id);
+    });
+
+    const addImageQuery = req.files.map((file) => {
+      const image = new Image({ url: file.path.slice(7) });
+      images.push(image);
+      return image.save();
+    });
+
+    await Promise.all([...removeDuplicateImagesQuery, ...addImageQuery]);
+
     const upateQuery = Note.findByIdAndUpdate(id, { title, content, images });
-    console.log(upateQuery);
     await upateQuery;
-
-    // await Promise.all(
-    //   req.files.map(async (file) => {
-    //     const image = new Image({ url: file.path.slice(7) });
-    //     images.push(image);
-    //     return image.save();
-    //   })
-    // );
-
-    // const newNote = new Note({ title, content, images });
-    // await newNote.save();
 
     res.json(
       `Note uploaded successfully: ${{ title, content, images, _id: id }}`
