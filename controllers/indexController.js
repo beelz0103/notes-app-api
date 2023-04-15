@@ -1,5 +1,6 @@
 const Image = require("../models/image");
 const Note = require("../models/note");
+const Label = require("../models/label");
 const multer = require("multer");
 
 const storage = multer.diskStorage({
@@ -91,3 +92,11 @@ exports.note_update = [
     );
   },
 ];
+
+exports.note_update.index_controller.labels_get = (req, res, next) => {
+  res.json(`Not Implemented: Get Labels`);
+};
+
+exports.note_update.index_controller.label_create = (req, res, next) => {
+  res.json(`Not Implemented: Create Label`);
+};
