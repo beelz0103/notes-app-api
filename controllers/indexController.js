@@ -28,12 +28,15 @@ const upload = multer({
 });
 
 exports.index = async (req, res, next) => {
-  res.render("index", { title: "Express" });
+  res.render("index", { title: "Notes App Api" });
 };
 
 exports.notes_get = async (req, res, next) => {
   try {
-    const notes = await Note.find().populate("images").exec();
+    const notes = await Note.find()
+      .populate("images")
+      .populate("labels")
+      .exec();
     res.json(notes);
   } catch (err) {
     return next(err);
@@ -93,10 +96,44 @@ exports.note_update = [
   },
 ];
 
-exports.note_update.index_controller.labels_get = (req, res, next) => {
-  res.json(`Not Implemented: Get Labels`);
+exports.note_update_labels = [
+  upload.none(),
+  async (req, res, next) => {
+    const id = req.params.id;
+    const { labelIds } = req.body;
+    console.log(labelIds);
+    let labels;
+
+    if (!labelIds) {
+      labels = [];
+    } else if (typeof labelIds === "string") {
+      console.log(109, labelIds);
+      labels = await Promise.all([Label.findById(labelIds)]);
+    } else {
+      labels = await Promise.all(labelIds.map((id) => Label.findById(id)));
+    }
+
+    console.log(labels);
+
+    const upatedNote = await Note.findByIdAndUpdate(
+      id,
+      { labels },
+      { new: true }
+    );
+
+    res.json(`Note uploaded successfully: ${{ upatedNote }}`);
+  },
+];
+
+exports.labels_get = async (req, res, next) => {
+  try {
+    const labels = await Label.find();
+    res.json(labels);
+  } catch (err) {
+    return next(err);
+  }
 };
 
-exports.note_update.index_controller.label_create = (req, res, next) => {
+exports.label_create = async (req, res, next) => {
   res.json(`Not Implemented: Create Label`);
 };
