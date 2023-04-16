@@ -101,14 +101,15 @@ exports.note_update_labels = [
   async (req, res, next) => {
     const id = req.params.id;
     const { labelId, checked } = req.body;
+    console.log(labelId);
     const label = await Label.findById(labelId);
     if (checked === "false") {
       await Note.updateOne({ _id: id }, { $pull: { labels: label._id } });
     } else if (checked === "true") {
       await Note.updateOne({ _id: id }, { $push: { labels: label._id } });
     }
-    const updatednote = await Note.findById(id);
-    res.json(`Note uploaded successfully: ${updatednote}`);
+    const updatednote = await Note.findById(id).populate("labels");
+    res.json(updatednote);
   },
 ];
 
@@ -121,6 +122,12 @@ exports.labels_get = async (req, res, next) => {
   }
 };
 
-exports.label_create = async (req, res, next) => {
-  res.json(`Not Implemented: Create Label`);
-};
+exports.label_create = [
+  upload.none(),
+  async (req, res, next) => {
+    const name = req.body.name;
+    const newLabel = new Label({ name });
+    await newLabel.save();
+    res.json(newLabel);
+  },
+];
