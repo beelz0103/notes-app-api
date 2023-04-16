@@ -100,28 +100,15 @@ exports.note_update_labels = [
   upload.none(),
   async (req, res, next) => {
     const id = req.params.id;
-    const { labelIds } = req.body;
-    console.log(labelIds);
-    let labels;
-
-    if (!labelIds) {
-      labels = [];
-    } else if (typeof labelIds === "string") {
-      console.log(109, labelIds);
-      labels = await Promise.all([Label.findById(labelIds)]);
-    } else {
-      labels = await Promise.all(labelIds.map((id) => Label.findById(id)));
+    const { labelId, checked } = req.body;
+    const label = await Label.findById(labelId);
+    if (checked === "false") {
+      await Note.updateOne({ _id: id }, { $pull: { labels: label._id } });
+    } else if (checked === "true") {
+      await Note.updateOne({ _id: id }, { $push: { labels: label._id } });
     }
-
-    console.log(labels);
-
-    const upatedNote = await Note.findByIdAndUpdate(
-      id,
-      { labels },
-      { new: true }
-    );
-
-    res.json(`Note uploaded successfully: ${{ upatedNote }}`);
+    const updatednote = await Note.findById(id);
+    res.json(`Note uploaded successfully: ${updatednote}`);
   },
 ];
 
