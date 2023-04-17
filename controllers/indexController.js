@@ -49,6 +49,7 @@ exports.notes_create = [
   async (req, res) => {
     const images = [];
     const { title, content } = req.body;
+    const labels = JSON.parse(req.body.labels);
 
     await Promise.all(
       req.files.map(async (file) => {
@@ -58,7 +59,7 @@ exports.notes_create = [
       })
     );
 
-    const newNote = new Note({ title, content, images });
+    const newNote = new Note({ title, content, images, labels });
     await newNote.save();
 
     res.json(`Note uploaded successfully: ${newNote}`);
