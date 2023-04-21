@@ -73,6 +73,7 @@ exports.note_update = [
     const id = req.params.id;
     const images = [];
     const { title, content } = req.body;
+    const labels = JSON.parse(req.body.labels);
 
     const note = await Note.findById(id);
     const noteImages = note.images;
@@ -88,7 +89,12 @@ exports.note_update = [
 
     await Promise.all([...removeDuplicateImagesQuery, ...addImageQuery]);
 
-    const upateQuery = Note.findByIdAndUpdate(id, { title, content, images });
+    const upateQuery = Note.findByIdAndUpdate(id, {
+      title,
+      content,
+      images,
+      labels,
+    });
     await upateQuery;
 
     res.json(
