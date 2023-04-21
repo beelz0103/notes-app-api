@@ -2,6 +2,7 @@ const Image = require("../models/image");
 const Note = require("../models/note");
 const Label = require("../models/label");
 const multer = require("multer");
+const fsPromises = require("fs").promises;
 
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
@@ -66,7 +67,20 @@ exports.notes_create = [
   },
 ];
 
-//add code for error handling later
+const removeDuplicateFiles = async () => {
+  const uploads = await fsPromises.readdir("./public/uploads");
+  const allImages = await Image.find({}, "url");
+  const allUrls = allImages.map((url) => url.url.slice(8));
+  const removeFiles = uploads
+    .filter((elem) => !allUrls.includes(elem))
+    .concat(allUrls.filter((elem) => !uploads.includes(elem)));
+  Promise.all(
+    removeFiles.map(async (path) => {
+      fsPromises.unlink("./public/uploads/" + path);
+    })
+  );
+};
+
 exports.note_update = [
   upload.array("file"),
   async (req, res) => {
@@ -78,7 +92,7 @@ exports.note_update = [
     const note = await Note.findById(id);
     const noteImages = note.images;
     const removeDuplicateImagesQuery = noteImages.map(async (image) => {
-      return Image.findByIdAndRemove(image._id);
+      await Image.findByIdAndRemove(image._id);
     });
 
     const addImageQuery = req.files.map((file) => {
@@ -88,6 +102,8 @@ exports.note_update = [
     });
 
     await Promise.all([...removeDuplicateImagesQuery, ...addImageQuery]);
+
+    await removeDuplicateFiles();
 
     const upateQuery = Note.findByIdAndUpdate(id, {
       title,
@@ -123,10 +139,16 @@ exports.note_update_labels = [
 exports.note_delete = [
   upload.none(),
   async (req, res, next) => {
-    const note = req.body.note;
     const note_id = req.params.id;
-    const deleteQuery = Note.findByIdAndRemove(note_id);
-    await deleteQuery;
+    const note = await Note.findById(note_id);
+    console.log(note);
+    const noteImages = note.images;
+    const removeImagesQuery = noteImages.map(async (image) => {
+      await Image.findByIdAndRemove(image._id);
+    });
+    const deleteQuery = note.deleteOne();
+    await Promise.all([...removeImagesQuery, deleteQuery]);
+    await removeDuplicateFiles();
     res.json(`Deleted note: ${note} with id: ${note_id}`);
   },
 ];
