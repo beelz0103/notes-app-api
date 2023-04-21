@@ -120,6 +120,17 @@ exports.note_update_labels = [
   },
 ];
 
+exports.note_delete = [
+  upload.none(),
+  async (req, res, next) => {
+    const note = req.body.note;
+    const note_id = req.params.id;
+    const deleteQuery = Note.findByIdAndRemove(note_id);
+    await deleteQuery;
+    res.json(`Deleted note: ${note} with id: ${note_id}`);
+  },
+];
+
 exports.labels_get = async (req, res, next) => {
   try {
     const labels = await Label.find();
