@@ -7,6 +7,9 @@ const Note = new Schema(
     content: String,
     labels: [{ type: Schema.Types.ObjectId, ref: "Label" }],
     images: [{ type: Schema.Types.ObjectId, ref: "Image" }],
+    deleted: { type: Boolean, default: false },
+    archived: { type: Boolean, default: false },
+    pinned: { type: Boolean, default: false },
   },
   { timestamps: true }
 );

@@ -140,6 +140,18 @@ exports.note_delete = [
   upload.none(),
   async (req, res, next) => {
     const note_id = req.params.id;
+    const deleteQuery = await Note.findByIdAndUpdate(note_id, {
+      deleted: !note.deleted,
+    });
+
+    res.json(`Deleted note: ${note} with id: ${note_id}`);
+  },
+];
+
+exports.note_delete_permanently = [
+  upload.none(),
+  async (req, res, next) => {
+    const note_id = req.params.id;
     const note = await Note.findById(note_id);
     console.log(note);
     const noteImages = note.images;
@@ -150,6 +162,24 @@ exports.note_delete = [
     await Promise.all([...removeImagesQuery, deleteQuery]);
     await removeDuplicateFiles();
     res.json(`Deleted note: ${note} with id: ${note_id}`);
+  },
+];
+
+exports.note_archive = [
+  upload.none(),
+  async (req, res, next) => {
+    const note_id = req.params.id;
+    const archiveQuery = await Note.findByIdAndUpdate(note_id, {
+      archived: !note.archived,
+    });
+    res.json(`Archived note: ${note} with id: ${note_id}`);
+  },
+];
+
+exports.note_update_pin = [
+  upload.none(),
+  async (req, res, next) => {
+    res.json(`archived note`);
   },
 ];
 
