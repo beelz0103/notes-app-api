@@ -5,6 +5,7 @@ var cookieParser = require("cookie-parser");
 var logger = require("morgan");
 const cors = require("cors");
 const fs = require("fs");
+require("dotenv").config();
 
 var indexRouter = require("./routes/index");
 var usersRouter = require("./routes/users");
@@ -12,7 +13,7 @@ var usersRouter = require("./routes/users");
 var app = express();
 
 const mongoose = require("mongoose");
-const mongoDB = "mongodb://127.0.0.1:27017/notesapp";
+const mongoDB = process.env.mongoDBLocal || process.env.mongoDBRailway;
 
 main().catch((err) => console.log(err));
 

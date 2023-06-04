@@ -26,6 +26,6 @@ router.post("/label/create", index_controller.label_create);
 
 router.get("/labels", index_controller.labels_get);
 
-router.post("/note/:id/pinupdate", index_controller.note_update_pin);
+router.post("/note/:id/pin", index_controller.note_update_pin);
 
 module.exports = router;
