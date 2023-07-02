@@ -14,6 +14,7 @@ var app = express();
 
 const mongoose = require("mongoose");
 const mongoDB = process.env.mongoDBLocal || process.env.mongoDBRailway;
+console.log("mongodburl", mongoDB);
 
 main().catch((err) => console.log(err));
 
